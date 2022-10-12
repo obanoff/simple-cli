@@ -2,16 +2,16 @@ pub mod logic {
 
     use std::io;
     use std::process;
+    use serde::{Serialize, Deserialize};
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     pub struct Bill {
         title: String,
         amount: i32,
     }
 
     impl Bill {
-
-        fn new(title: &str, amount: i32) -> Self {
+        pub fn new(title: &str, amount: i32) -> Self {
             Self {
                 title: title.to_owned(),
                 amount,
@@ -32,12 +32,12 @@ pub mod logic {
     }
 
     pub fn add(bills: &mut Bills) {
-        println!("\nEnter title\n");
+        println!("\nEnter title:\n");
 
         let title = get_input();
 
         loop {
-            println!("\nEnter amount\n");
+            println!("\nEnter amount:\n");
 
             let amount = get_input().parse::<i32>();
         
@@ -106,7 +106,7 @@ pub mod logic {
     }
 
     pub fn remove(bills: &mut Bills) {
-        println!("\nEnter a bill's title to remove");
+        println!("\nEnter a bill's title to remove:\n");
 
         let title = get_input();
 
@@ -116,6 +116,63 @@ pub mod logic {
             println!("\nThe bill has been removed");
         } else {
             println!("\nNo bills with that title found");
+        }
+    }
+
+    pub fn edit(bills: &mut Bills) {
+        println!("\nEnter a title of bill to edit\n");
+        let answer = get_input();
+
+        let position = bills.iter().position(|x| x.title == answer);
+
+        match position {
+            Some(i) => {
+                let clone = bills[i].clone();
+
+                println!("\nEnter a new title:\n");
+                let title = get_input();
+
+                bills[i].title = title;
+
+                loop {
+                    println!("\nEnter a new amount:\n");
+                    let amount = get_input().parse::<i32>();
+
+                    match amount {
+                        Ok(n) => {
+                            bills[i].amount = n;
+                            println!("\nThe bill has been edited");
+
+                            println!("\nConfirm changes (yes/no)");
+                            loop {
+                                let answer = get_input().to_lowercase();
+
+                                match answer.as_str() {
+                                    "yes" => {
+                                        println!("\nChanges confirmed");
+                                        break;
+                                    },
+                                    "no" => {
+                                        bills[i] = clone;
+                                        println!("\nChanges declined");
+                                        break;
+                                    },
+                                    _ => {
+                                        println!("\nWrong input,expected 'yes' or 'no'");
+                                        continue;
+                                    },
+                                }
+                            }
+                            break;
+                        },
+                        Err(_) => {
+                            println!("\nWrong input, expected a number");
+                            continue;
+                        },
+                    }
+                }
+            },
+            None => println!("\nNo bills with that name found"),
         }
     }
 
