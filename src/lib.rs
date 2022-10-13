@@ -24,10 +24,16 @@ pub mod logic {
     pub fn get_input() -> String {
         let mut buff = String::new();
 
-        io::stdin().read_line(&mut buff).unwrap_or_else(|err| {
-            println!("Error: {err}");
-            process::exit(1);
-        });
+        loop {
+            io::stdin().read_line(&mut buff).unwrap_or_else(|err| {
+                println!("Error: {err}");
+                process::exit(1);
+            });
+            if buff.trim().len() == 0 {
+                println!("\nInput cannot be empty\n");
+                continue;
+            } else { break; }
+        }
         buff.trim().to_owned()
     }
 
@@ -112,8 +118,25 @@ pub mod logic {
 
         if find(bills, &title) {
             let position = bills.iter().position(|x| x.title == title).unwrap();
-            bills.remove(position);
-            println!("\nThe bill has been removed");
+
+            println!("\nConfirm the operation (yes/no)\n");
+            
+            loop {
+                let answer = get_input();
+
+                match answer.as_str() {
+                    "yes" => {
+                        bills.remove(position);
+                        println!("\nThe bill has been removed");
+                        break;
+                    },
+                    "no" => break,
+                    _ => {
+                        println!("\nWrong input, expected 'yes' or 'no'\n");
+                        continue;
+                    }
+                }
+            }   
         } else {
             println!("\nNo bills with that title found");
         }

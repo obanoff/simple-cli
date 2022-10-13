@@ -1,1 +1,1 @@
-[{"title":"b","amount":100},{"title":"b2","amount":200}]
+[{"title":"b","amount":100}]
